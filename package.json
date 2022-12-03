@@ -1,0 +1,19 @@
+{
+  "name": "gl-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "python -m SimpleHTTPServer 8899"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ll5/gl-test.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ll5/gl-test/issues"
+  },
+  "homepage": "https://github.com/ll5/gl-test#readme"
+}
