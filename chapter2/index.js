@@ -15,17 +15,28 @@ async function initShaderProgram(gl) {
         console.log(gl.getProgramInfoLog(program));
         return null;
     }
-
+    gl.useProgram(program);
     return program;
 }
 
-function initBuffers(gl) {
+const position = new Float32Array([1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, -1.0]);
+const colors = new Float32Array([1.0,  1.0,  1.0, 1.0,  0.0,  0.0, 0.0,  1.0,  0.0, 0.0,  0.0,  1.0]);
+function initBuffers(gl, program) {
+    // position buffer
     const positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    const position = new Float32Array([
-        1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, -1.0,
-    ]);
     gl.bufferData(gl.ARRAY_BUFFER, position, gl.STATIC_DRAW);
+    const avPosition = gl.getAttribLocation(program, 'avPosition');
+    gl.vertexAttribPointer(avPosition, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(avPosition);
+
+    // color buffer
+    const colorBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
+    const avColor = gl.getAttribLocation(program, 'avColor');
+    gl.vertexAttribPointer(avColor, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(avColor);
 }
 
 function drawScene(gl, program) {
@@ -37,47 +48,17 @@ function drawScene(gl, program) {
 
     const fovy = 45 * Math.PI / 180
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-    const projectionMatrix = mat4.create();
-    mat4.perspective(
-        projectionMatrix,
-        fovy,
-        aspect,
-        0.1,
-        100
-    );
+    const proMatrix = mat4.create();
+    mat4.perspective(proMatrix, fovy, aspect, 0.1, 100);
 
-    const modelViewMatrix = mat4.create();
-    const modelViewTranslate = [-0.0, 0.0, -10.0];
-    mat4.translate(modelViewMatrix, modelViewMatrix, modelViewTranslate);
+    const mvMatrix = mat4.create();
+    const mvTranslate = [-0.0, -0.0, -5.0];
+    mat4.translate(mvMatrix, mvMatrix, mvTranslate);
 
-    const $vertexPosition = gl.getAttribLocation(program, 'aVertexPosition');
-    const $projectionMatrix = gl.getUniformLocation(program, 'uProjectionMatrix');
-    const $modelViewMatrix = gl.getUniformLocation(program, 'uModelViewMatrix');
-
-    gl.vertexAttribPointer(
-        $vertexPosition,
-        2,
-        gl.FLOAT,
-        false,
-        0,
-        0
-    );
-    gl.enableVertexAttribArray($vertexPosition);
-
-    gl.useProgram(program);
-
-
-    gl.uniformMatrix4fv(
-        $projectionMatrix,
-        false,
-        projectionMatrix
-    );
-
-    gl.uniformMatrix4fv(
-        $modelViewMatrix,
-        false,
-        modelViewMatrix
-    );
+    const uProMatrix = gl.getUniformLocation(program, 'uProMatrix');
+    const uMvMatrix = gl.getUniformLocation(program, 'uMvMatrix');
+    gl.uniformMatrix4fv(uProMatrix, false, proMatrix);
+    gl.uniformMatrix4fv(uMvMatrix, false, mvMatrix);
 
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 }
@@ -90,7 +71,7 @@ async function draw() {
 
     if(!program) return;
 
-    initBuffers(gl);
+    initBuffers(gl, program);
     drawScene(gl, program);
 }
 
