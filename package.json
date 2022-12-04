@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "python -m SimpleHTTPServer 8899"
+    "print": "echo 'Serveing on http://localhost:8899'",
+    "dev": "yarn print && python -m SimpleHTTPServer 8899"
   },
   "repository": {
     "type": "git",
